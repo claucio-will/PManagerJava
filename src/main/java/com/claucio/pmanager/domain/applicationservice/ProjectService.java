@@ -5,13 +5,15 @@ import com.claucio.pmanager.domain.model.ProjectStatus;
 import com.claucio.pmanager.domain.respository.ProjectRepository;
 import com.claucio.pmanager.infrastructure.DTO.SaveProjectDataDTO;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor //Cria construtor porque o ProjectRepository é final e todos os atributos final precisa ser iniciados
+@Slf4j //Para gerar o objeto log
 public class ProjectService {
+
 
     private final ProjectRepository projectRepository;
 
@@ -21,6 +23,7 @@ public class ProjectService {
      * */
     @Transactional //
     public Project createProject(SaveProjectDataDTO saveProjectData) {
+
         Project project = Project.builder()
                 .name(saveProjectData.getName())
                 .description(saveProjectData.getDescription())
@@ -30,6 +33,9 @@ public class ProjectService {
                 .build();
 
         projectRepository.save(project);
+        log.info("Project created:" + project);
+
+
 
         return project;
     }
