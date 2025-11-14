@@ -19,6 +19,8 @@ import static jakarta.persistence.GenerationType.UUID;
 @Table(name = "project")
 public class Project {
 
+
+
     @Id
     @GeneratedValue(strategy = UUID) // UUID Gera String unica
     @Column(name = "id", nullable = false, length = 36)
