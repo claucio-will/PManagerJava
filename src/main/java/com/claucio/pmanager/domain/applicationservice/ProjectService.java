@@ -1,6 +1,7 @@
 package com.claucio.pmanager.domain.applicationservice;
 
 import com.claucio.pmanager.domain.entity.Project;
+import com.claucio.pmanager.domain.exception.DuplicateProjectException;
 import com.claucio.pmanager.domain.exception.InvalidProjectStatusException;
 import com.claucio.pmanager.domain.exception.ProjectNotFoundException;
 import com.claucio.pmanager.domain.model.ProjectStatus;
@@ -10,6 +11,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 
 @Service
@@ -29,6 +32,9 @@ public class ProjectService {
      */
     @Transactional //
     public Project createProject(SaveProjectDataDTO saveProjectData) {
+        if (existsProjectWithName(saveProjectData.getName(), null)) {
+            throw new DuplicateProjectException(saveProjectData.getName());
+        }
 
         Project project = Project.builder()
                 .name(saveProjectData.getName())
@@ -57,6 +63,10 @@ public class ProjectService {
 
     @Transactional
     public Project updateProject(String projectId, SaveProjectDataDTO saveProjectDataDTO) {
+        if (existsProjectWithName(saveProjectDataDTO.getName(), projectId)) {
+            throw new DuplicateProjectException(saveProjectDataDTO.getName());
+        }
+
         Project project = loadProject(projectId);
         project.setName(saveProjectDataDTO.getName());
         project.setDescription(saveProjectDataDTO.getDescription());
@@ -73,5 +83,12 @@ public class ProjectService {
             throw new InvalidProjectStatusException(statusStr);
 
         }
+    }
+
+    private boolean existsProjectWithName(String name, String idToExclude) {
+        return projectRepository
+                .findByName(name)
+                .filter(p -> !Objects.equals(p.getId(), idToExclude))
+                .isPresent();
     }
 }

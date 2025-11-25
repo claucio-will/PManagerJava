@@ -53,6 +53,7 @@ public class ProjectResource {
         Project project = projectService.updateProject(projectId, saveProjectDataDTO);
         return ResponseEntity.ok(ProjectDTO.create(project));
 
+
     }
 
 }
