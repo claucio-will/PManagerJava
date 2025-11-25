@@ -34,15 +34,25 @@ public class ProjectResource {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProjectDTO> loadProject(@PathVariable("id") String projectId){
+    public ResponseEntity<ProjectDTO> loadProject(@PathVariable("id") String projectId) {
         Project project = projectService.loadProject(projectId);
-        return  ResponseEntity.ok(ProjectDTO.create(project));
+        return ResponseEntity.ok(ProjectDTO.create(project));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProject(@PathVariable("id") String projectId){
+    public ResponseEntity<Void> deleteProject(@PathVariable("id") String projectId) {
         projectService.deleteProject(projectId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<ProjectDTO> updateProject(
+            @PathVariable("id") String projectId,
+            @RequestBody SaveProjectDataDTO saveProjectDataDTO) {
+
+        Project project = projectService.updateProject(projectId, saveProjectDataDTO);
+        return ResponseEntity.ok(ProjectDTO.create(project));
+
     }
 
 }

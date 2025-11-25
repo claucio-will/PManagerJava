@@ -1,6 +1,7 @@
 package com.claucio.pmanager.domain.applicationservice;
 
 import com.claucio.pmanager.domain.entity.Project;
+import com.claucio.pmanager.domain.exception.InvalidProjectStatusException;
 import com.claucio.pmanager.domain.exception.ProjectNotFoundException;
 import com.claucio.pmanager.domain.model.ProjectStatus;
 import com.claucio.pmanager.domain.respository.ProjectRepository;
@@ -12,7 +13,8 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-@RequiredArgsConstructor//Cria construtor porque o ProjectRepository é final e todos os atributos final precisa ser iniciados
+@RequiredArgsConstructor
+//Cria construtor porque o ProjectRepository é final e todos os atributos final precisa ser iniciados
 @Slf4j //Para gerar o objeto log
 public class ProjectService {
 
@@ -51,5 +53,25 @@ public class ProjectService {
     public void deleteProject(String projectId) {
         Project project = loadProject(projectId);
         projectRepository.delete(project);
+    }
+
+    @Transactional
+    public Project updateProject(String projectId, SaveProjectDataDTO saveProjectDataDTO) {
+        Project project = loadProject(projectId);
+        project.setName(saveProjectDataDTO.getName());
+        project.setDescription(saveProjectDataDTO.getDescription());
+        project.setInitialDate(saveProjectDataDTO.getInitialDate());
+        project.setFinalDate(saveProjectDataDTO.getFinalDate());
+        project.setStatus(projectStatus(saveProjectDataDTO.getStatus()));
+        return project;
+    }
+
+    private ProjectStatus projectStatus(String statusStr) {
+        try {
+            return ProjectStatus.valueOf(statusStr);
+        } catch (IllegalArgumentException | InvalidProjectStatusException e) {
+            throw new InvalidProjectStatusException(statusStr);
+
+        }
     }
 }
