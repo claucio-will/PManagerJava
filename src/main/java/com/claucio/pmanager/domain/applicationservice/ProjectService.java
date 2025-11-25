@@ -1,6 +1,7 @@
 package com.claucio.pmanager.domain.applicationservice;
 
 import com.claucio.pmanager.domain.entity.Project;
+import com.claucio.pmanager.domain.exception.ProjectNotFoundException;
 import com.claucio.pmanager.domain.model.ProjectStatus;
 import com.claucio.pmanager.domain.respository.ProjectRepository;
 import com.claucio.pmanager.infrastructure.DTO.SaveProjectDataDTO;
@@ -9,18 +10,21 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+
 @Service
-@RequiredArgsConstructor //Cria construtor porque o ProjectRepository é final e todos os atributos final precisa ser iniciados
+@RequiredArgsConstructor//Cria construtor porque o ProjectRepository é final e todos os atributos final precisa ser iniciados
 @Slf4j //Para gerar o objeto log
 public class ProjectService {
 
 
     private final ProjectRepository projectRepository;
 
-    /** Transactional
+    /**
+     * Transactional
      * Faz a chamada de uma transação atômica no banco, ou seja ou tudo é feito ou nada é feito.
-     * caso ocorra um erro ao tentar excluir um registro nada ira acontecer
-     * */
+     * caso ocorra por exemplo um erro ao tentar excluir um registro nada ira acontecer
+     *
+     */
     @Transactional //
     public Project createProject(SaveProjectDataDTO saveProjectData) {
 
@@ -34,9 +38,18 @@ public class ProjectService {
 
         projectRepository.save(project);
         log.info("Project created:" + project);
-
-
-
         return project;
+    }
+
+    public Project loadProject(String projectId) {
+        return projectRepository
+                .findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(projectId));
+    }
+
+    @Transactional
+    public void deleteProject(String projectId) {
+        Project project = loadProject(projectId);
+        projectRepository.delete(project);
     }
 }

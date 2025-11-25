@@ -6,6 +6,7 @@ import com.claucio.pmanager.infrastructure.DTO.ProjectDTO;
 import com.claucio.pmanager.infrastructure.DTO.SaveProjectDataDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -16,19 +17,32 @@ import static com.claucio.pmanager.infrastructure.controller.RestConstants.PATH_
 @RestController
 @RequestMapping(PATH_PROJECTS)
 @RequiredArgsConstructor
+@SuppressWarnings("unused")
 public class ProjectResource {
 
 
     private final ProjectService projectService;
 
     @PostMapping
-    public ResponseEntity<ProjectDTO> createProject(@RequestBody SaveProjectDataDTO saveProjectDataDTO) {
+    public ResponseEntity<ProjectDTO> createProject(@RequestBody @Validated SaveProjectDataDTO saveProjectDataDTO) {
         Project project = projectService.createProject(saveProjectDataDTO);
         return ResponseEntity.
                 created(URI.create(PATH_PROJECTS + project.getId()))
                 .body(ProjectDTO.create(project));
 
+
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ProjectDTO> loadProject(@PathVariable("id") String projectId){
+        Project project = projectService.loadProject(projectId);
+        return  ResponseEntity.ok(ProjectDTO.create(project));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProject(@PathVariable("id") String projectId){
+        projectService.deleteProject(projectId);
+        return ResponseEntity.noContent().build();
+    }
 
 }
