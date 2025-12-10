@@ -18,7 +18,7 @@ import static com.claucio.pmanager.infrastructure.controller.RestConstants.PATH_
 @RequestMapping(PATH_PROJECTS)
 @RequiredArgsConstructor
 @SuppressWarnings("unused")
-public class ProjectResource {
+public class ProjectRestResource {
 
 
     private final ProjectService projectService;
